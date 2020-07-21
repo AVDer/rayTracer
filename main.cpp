@@ -1,10 +1,9 @@
 #include <iostream>
 
-#include "ppm_image.h"
+#include "scene.h"
 
 int main() {
-  PpmImage image;
-  image.resize(768, 432);
-  image.random();
-  image.print();
+  Scene scene;
+  scene.set_width(800);
+  scene.generate();
 }

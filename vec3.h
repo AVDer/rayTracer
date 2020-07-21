@@ -6,14 +6,14 @@
 
 template <typename T> class Vec3 {
 public:
-  Vec3() : e_{0, 0, 0} {}
-  Vec3(T e0, T e1, T e2) : e_{e0, e1, e2} {}
+  constexpr Vec3() : e_{0, 0, 0} {}
+  constexpr Vec3(T e0, T e1, T e2) : e_{e0, e1, e2} {}
 
-  T x() const { return e_[0]; }
-  T y() const { return e_[1]; }
-  T z() const { return e_[2]; }
+  constexpr T x() const { return e_[0]; }
+  constexpr T y() const { return e_[1]; }
+  constexpr T z() const { return e_[2]; }
 
-  Vec3 operator-() const { return Vec3(-e_[0], -e_[1], -e_[2]); }
+  constexpr Vec3 operator-() const { return Vec3(-e_[0], -e_[1], -e_[2]); }
   T operator[](size_t i) const { return e_[i]; }
   T &operator[](size_t i) { return e_[i]; }
 
@@ -33,9 +33,9 @@ public:
 
   template <typename M> Vec3 &operator/=(const M t) { return *this *= 1 / t; }
 
-  double_t length() const { return std::sqrt(length_squared()); }
+  constexpr double_t length() const { return std::sqrt(length_squared()); }
 
-  double_t length_squared() const {
+  constexpr double_t length_squared() const {
     return e_[0] * e_[0] + e_[1] * e_[1] + e_[2] * e_[2];
   }
 
@@ -55,35 +55,35 @@ inline std::ostream &operator<<(std::ostream &out, const vec3d_t &v) {
   return out << v.x() << ' ' << v.y() << ' ' << v.z();
 }
 
-inline vec3d_t operator+(const vec3d_t &u, const vec3d_t &v) {
+inline constexpr vec3d_t operator+(const vec3d_t &u, const vec3d_t &v) {
   return vec3d_t(u.x() + v.x(), u.y() + v.y(), u.z() + v.z());
 }
 
-inline vec3d_t operator-(const vec3d_t &u, const vec3d_t &v) {
+inline constexpr vec3d_t operator-(const vec3d_t &u, const vec3d_t &v) {
   return vec3d_t(u.x() - v.x(), u.y() - v.y(), u.z() - v.z());
 }
 
-inline vec3d_t operator*(const vec3d_t &u, const vec3d_t &v) {
+inline constexpr vec3d_t operator*(const vec3d_t &u, const vec3d_t &v) {
   return vec3d_t(u.x() * v.x(), u.y() * v.y(), u.z() * v.z());
 }
 
-inline vec3d_t operator*(double t, const vec3d_t &v) {
+inline constexpr vec3d_t operator*(double t, const vec3d_t &v) {
   return vec3d_t(t * v.x(), t * v.y(), t * v.z());
 }
 
-inline vec3d_t operator*(const vec3d_t &v, double t) { return t * v; }
+inline constexpr vec3d_t operator*(const vec3d_t &v, double t) { return t * v; }
 
-inline vec3d_t operator/(vec3d_t v, double t) { return (1 / t) * v; }
+inline constexpr vec3d_t operator/(vec3d_t v, double t) { return (1 / t) * v; }
 
-inline double dot(const vec3d_t &u, const vec3d_t &v) {
+inline constexpr double dot(const vec3d_t &u, const vec3d_t &v) {
   return u.x() * v.x() + u.y() * v.y() + u.z() * v.z();
 }
 
-inline vec3d_t cross(const vec3d_t &u, const vec3d_t &v) {
+inline constexpr vec3d_t cross(const vec3d_t &u, const vec3d_t &v) {
   return vec3d_t(u.y() * v.z() - u.z() * v.y(), u.z() * v.x() - u.x() * v.z(),
                  u.x() * v.y() - u.y() * v.x());
 }
 
-inline vec3d_t unit_vector(vec3d_t v) { return v / v.length(); }
+inline constexpr vec3d_t unit_vector(vec3d_t v) { return v / v.length(); }
 
 #endif // CS_VEC3_H

@@ -20,6 +20,10 @@ public:
     }
   }
 
+  void set_pixel(size_t x, size_t y, color_t color) {
+    data_[y][x] = color * kMaxColor;
+  }
+
   void random() {
     std::random_device rd;
     std::mt19937 gen(rd());
