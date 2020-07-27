@@ -47,7 +47,6 @@ public:
                   << static_cast<uint16_t>(data_[h][w].y()) << ' '
                   << static_cast<uint16_t>(data_[h][w].z()) << '\n';
       }
-      std::cout << '\n';
     }
   }
 

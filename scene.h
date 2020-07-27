@@ -1,6 +1,10 @@
 #ifndef SC_SCENE_H
 #define SC_SCENE_H
 
+#include <memory>
+
+#include "circle.h"
+#include "object.h"
 #include "ppm_image.h"
 #include "ray.h"
 #include "vec3.h"
@@ -23,6 +27,10 @@ class Scene {
       kOrigin - kHorizontal / 2 - kVertical / 2 - vec3d_t(0, 0, kFocalLength);
 
 public:
+  Scene() {
+    objects_.emplace_back(std::make_unique<Circle>(point3_t(0, 0, 1), 0.5));
+  }
+
   void set_width(size_t width) {
     width_ = width;
     height_ = static_cast<size_t>(width_ / kAspectRatio);
@@ -36,8 +44,17 @@ public:
         auto v = double(j) / (height_ - 1);
         Ray r(kOrigin,
               kLowerLeftCorner + u * kHorizontal + v * kVertical - kOrigin);
-        color_t pixel_color = ray_color(r);
-        image_.set_pixel(i, j, pixel_color);
+        bool found{false};
+        for (auto &o : objects_) {
+          if (o->meet(r)) {
+            image_.set_pixel(i, j, color_t(0, 0.5, 0.5));
+            found = true;
+          }
+        }
+        if (!found) {
+          color_t pixel_color = ray_color(r);
+          image_.set_pixel(i, j, pixel_color);
+        }
       }
     }
     image_.print();
@@ -54,6 +71,8 @@ private:
   size_t height_;
 
   PpmImage image_;
+
+  std::vector<std::unique_ptr<Object>> objects_;
 };
 
 #endif // SC_SCENE_H
