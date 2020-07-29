@@ -44,17 +44,8 @@ public:
         auto v = double(j) / (height_ - 1);
         Ray r(kOrigin,
               kLowerLeftCorner + u * kHorizontal + v * kVertical - kOrigin);
-        bool found{false};
-        for (auto &o : objects_) {
-          if (o->meet(r)) {
-            image_.set_pixel(i, j, color_t(0, 0.5, 0.5));
-            found = true;
-          }
-        }
-        if (!found) {
-          color_t pixel_color = ray_color(r);
-          image_.set_pixel(i, j, pixel_color);
-        }
+        color_t pixel_color = ray_color(r);
+        image_.set_pixel(i, j, pixel_color);
       }
     }
     image_.print();
@@ -62,6 +53,12 @@ public:
 
 private:
   color_t ray_color(const Ray &r) {
+    for (auto &o : objects_) {
+      if (o->meet(r)) {
+        return color_t(0, 0.5, 0.5);
+      }
+    }
+
     vec3d_t unit_direction = unit_vector(r.direction());
     auto t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - t) * color_t(1.0, 1.0, 1.0) + t * color_t(0.5, 0.7, 1.0);
