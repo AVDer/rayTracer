@@ -19,4 +19,6 @@ public:
   vec3d_t direction_;
 };
 
+std::ostream &operator<<(std::ostream &out, const Ray &ray);
+
 #endif // SC_RAY_H

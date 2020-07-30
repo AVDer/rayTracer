@@ -28,7 +28,8 @@ class Scene {
 
 public:
   Scene() {
-    objects_.emplace_back(std::make_unique<Circle>(point3_t(0, 0, 1), 0.5));
+    std::cerr << kLowerLeftCorner << std::endl;
+    objects_.emplace_back(std::make_unique<Circle>(point3_t(0, 0, -1), 0.5));
   }
 
   void set_width(size_t width) {
@@ -45,7 +46,7 @@ public:
         Ray r(kOrigin,
               kLowerLeftCorner + u * kHorizontal + v * kVertical - kOrigin);
         color_t pixel_color = ray_color(r);
-        image_.set_pixel(i, j, pixel_color);
+        image_.set_pixel(i, height_ - j - 1, pixel_color);
       }
     }
     image_.print();
@@ -53,9 +54,12 @@ public:
 
 private:
   color_t ray_color(const Ray &r) {
+    // std::cerr << r << std::endl;
     for (auto &o : objects_) {
-      if (o->meet(r)) {
-        return color_t(0, 0.5, 0.5);
+      auto n = o->hit_normal(r);
+      if (n.has_value()) {
+        auto N = n.value();
+        return 0.5 * color_t(N.x() + 1, N.y() + 1, N.z() + 1);
       }
     }
 

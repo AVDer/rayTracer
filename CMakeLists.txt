@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 project(rayTracer VERSION 1.0
         LANGUAGES CXX)
 
-add_executable(rayTracer main.cpp)
+add_executable(rayTracer main.cpp ray.cpp)
 
 #target_include_directories(rayTracer PUBLIC include)
 #target_link_libraries(rayTracer PUBLIC X11 Xft pthread fontconfig)
