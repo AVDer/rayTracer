@@ -17,14 +17,14 @@ public:
     solve(ray);
     if (k4_ < 0)
       return std::nullopt;
-    return (-k2_ - std::sqrt(k4_)) / (2. * k1_);
+    return (-k2_ - std::sqrt(k4_)) / k1_;
   }
 
   std::optional<vec3d_t> hit_normal(const Ray &ray) override {
     solve(ray);
     if (k4_ < 0)
       return std::nullopt;
-    double_t t = (-k2_ - std::sqrt(k4_)) / (2. * k1_);
+    double_t t = (-k2_ - std::sqrt(k4_)) / k1_;
     return unit_vector(ray.at(t) - center_);
   }
 
@@ -33,16 +33,16 @@ private:
   double_t radius_;
 
   double_t k1_; // a
-  double_t k2_; // b
+  double_t k2_; // b / 2
   double_t k3_; // c
   double_t k4_; // D
 
   void solve(const Ray &ray) {
     auto oc = ray.origin() - center_;
-    k1_ = dot(ray.direction(), ray.direction());
-    k2_ = 2 * dot(ray.direction(), oc);
-    k3_ = dot(oc, oc) - radius_ * radius_;
-    k4_ = k2_ * k2_ - 4 * k1_ * k3_;
+    k1_ = ray.direction().length_squared();
+    k2_ = dot(ray.direction(), oc);
+    k3_ = oc.length_squared() - radius_ * radius_;
+    k4_ = k2_ * k2_ - k1_ * k3_;
   }
 };
 
