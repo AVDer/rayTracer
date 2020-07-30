@@ -8,24 +8,16 @@ class Circle : public Object {
 public:
   Circle(point3_t center, double_t radius) : center_(center), radius_(radius) {}
 
-  bool meet(const Ray &ray) override {
-    solve(ray);
-    return k4_ >= 0;
-  }
-
-  std::optional<double_t> hit_point(const Ray &ray) override {
+  std::optional<hit_t> hit(const Ray &ray) override {
     solve(ray);
     if (k4_ < 0)
       return std::nullopt;
-    return (-k2_ - std::sqrt(k4_)) / k1_;
-  }
+    hit_t result;
+    result.ray_pos = (-k2_ - std::sqrt(k4_)) / k1_;
+    result.point = ray.at(result.ray_pos);
+    result.normal = unit_vector(result.point - center_);
 
-  std::optional<vec3d_t> hit_normal(const Ray &ray) override {
-    solve(ray);
-    if (k4_ < 0)
-      return std::nullopt;
-    double_t t = (-k2_ - std::sqrt(k4_)) / k1_;
-    return unit_vector(ray.at(t) - center_);
+    return result;
   }
 
 private:

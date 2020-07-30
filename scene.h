@@ -56,10 +56,11 @@ private:
   color_t ray_color(const Ray &r) {
     // std::cerr << r << std::endl;
     for (auto &o : objects_) {
-      auto n = o->hit_normal(r);
-      if (n.has_value()) {
-        auto N = n.value();
-        return 0.5 * color_t(N.x() + 1, N.y() + 1, N.z() + 1);
+      auto h = o->hit(r);
+      if (h.has_value()) {
+        auto hit = h.value();
+        return 0.5 * color_t(hit.normal.x() + 1, hit.normal.y() + 1,
+                             hit.normal.z() + 1);
       }
     }
 

@@ -5,11 +5,15 @@
 
 #include "ray.h"
 
+struct hit_t {
+  point3_t point;
+  double_t ray_pos;
+  vec3d_t normal;
+};
+
 class Object {
 public:
-  virtual bool meet(const Ray &ray) = 0;
-  virtual std::optional<double_t> hit_point(const Ray &ray) = 0;
-  virtual std::optional<vec3d_t> hit_normal(const Ray &ray) = 0;
+  virtual std::optional<hit_t> hit(const Ray &ray) = 0;
 
 protected:
   color_t color_;
