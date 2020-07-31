@@ -1,6 +1,7 @@
 #ifndef SC_PPM_IMAGE_H
 #define SC_PPM_IMAGE_H
 
+#include <algorithm>
 #include <random>
 #include <vector>
 
@@ -21,7 +22,11 @@ public:
   }
 
   void set_pixel(size_t x, size_t y, color_t color) {
-    data_[y][x] = color * kMaxColor;
+    data_[y][x] = color * kMaxColor / samples_per_pixel_;
+  }
+
+  void set_spp(uint32_t samples_per_pixel) {
+    samples_per_pixel_ = samples_per_pixel;
   }
 
   void random() {
@@ -43,9 +48,10 @@ public:
               << kMaxColor << '\n';
     for (size_t h{0}; h < height_; ++h) {
       for (size_t w{0}; w < width_; ++w) {
-        std::cout << static_cast<uint16_t>(data_[h][w].x()) << ' '
-                  << static_cast<uint16_t>(data_[h][w].y()) << ' '
-                  << static_cast<uint16_t>(data_[h][w].z()) << '\n';
+        std::cout << std::clamp<uint16_t>(data_[h][w].x(), 0, kMaxColor) << ' '
+                  << std::clamp<uint16_t>(data_[h][w].y(), 0, kMaxColor) << ' '
+                  << std::clamp<uint16_t>(data_[h][w].z(), 0, kMaxColor)
+                  << '\n';
       }
     }
   }
@@ -54,6 +60,7 @@ private:
   size_t width_{0};
   size_t height_{0};
   std::vector<std::vector<color_t>> data_;
+  uint32_t samples_per_pixel_{1};
 };
 
 #endif // SC_PPM_IMAGE_H

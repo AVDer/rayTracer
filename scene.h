@@ -1,34 +1,20 @@
 #ifndef SC_SCENE_H
 #define SC_SCENE_H
 
-#include <memory>
-
+#include "camera.h"
 #include "circle.h"
+#include "misc.h"
 #include "objects.h"
 #include "ppm_image.h"
-#include "ray.h"
-#include "vec3.h"
 
 class Scene {
 
-  static constexpr double_t kAspectRatio{16.0 / 9.0};
-
-  // Viewport settings
-  static constexpr double_t kViewportHeight{2.0};
-  static constexpr double_t kViewportWidth{kViewportHeight * kAspectRatio};
-  static constexpr double_t kFocalLength{1.0};
-
-  // Camera
-
-  static constexpr auto kOrigin{point3_t(0, 0, 0)};
-  static constexpr auto kHorizontal = vec3d_t(kViewportWidth, 0, 0);
-  static constexpr auto kVertical = vec3d_t(0, kViewportHeight, 0);
-  static constexpr auto kLowerLeftCorner =
-      kOrigin - kHorizontal / 2 - kVertical / 2 - vec3d_t(0, 0, kFocalLength);
+  const uint32_t kSpp{10};
 
 public:
   Scene() {
     // std::cerr << kLowerLeftCorner << std::endl;
+    image_.set_spp(kSpp);
     objects_.add(std::make_shared<Circle>(point3_t(0, 0, -1), 0.5));
     objects_.add(std::make_shared<Circle>(point3_t(0, -100.5, -1), 100));
   }
@@ -42,12 +28,13 @@ public:
   void generate() {
     for (size_t j{0}; j < height_; ++j) {
       for (size_t i{0}; i < width_; ++i) {
-        auto u = double(i) / (width_ - 1);
-        auto v = double(j) / (height_ - 1);
-        Ray r(kOrigin,
-              kLowerLeftCorner + u * kHorizontal + v * kVertical - kOrigin);
-        color_t pixel_color = ray_color(r);
-        image_.set_pixel(i, height_ - j - 1, pixel_color);
+        color_t color(0, 0, 0);
+        for (uint32_t s{0}; s < kSpp; ++s) {
+          auto u = (double(i) + rt::random_double()) / (width_ - 1);
+          auto v = (double(j) + rt::random_double()) / (height_ - 1);
+          color += ray_color(camera_.get_ray(u, v));
+        }
+        image_.set_pixel(i, height_ - j - 1, color);
       }
     }
     image_.print();
@@ -72,6 +59,7 @@ private:
 
   PpmImage image_;
 
+  Camera camera_;
   Objects objects_;
 };
 
