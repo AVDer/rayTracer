@@ -30,6 +30,7 @@ public:
   Scene() {
     // std::cerr << kLowerLeftCorner << std::endl;
     objects_.add(std::make_shared<Circle>(point3_t(0, 0, -1), 0.5));
+    objects_.add(std::make_shared<Circle>(point3_t(0, -100.5, -1), 100));
   }
 
   void set_width(size_t width) {
@@ -58,8 +59,7 @@ private:
     auto h = objects_.hit(r, 0, std::numeric_limits<double_t>::infinity());
     if (h.has_value()) {
       auto hit = h.value();
-      return 0.5 * color_t(hit.normal.x() + 1, hit.normal.y() + 1,
-                           hit.normal.z() + 1);
+      return 0.5 * (hit.normal + color_t(1, 1, 1));
     }
 
     vec3d_t unit_direction = unit_vector(r.direction());
