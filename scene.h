@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "circle.h"
-#include "object.h"
+#include "objects.h"
 #include "ppm_image.h"
 #include "ray.h"
 #include "vec3.h"
@@ -28,8 +28,8 @@ class Scene {
 
 public:
   Scene() {
-    std::cerr << kLowerLeftCorner << std::endl;
-    objects_.emplace_back(std::make_unique<Circle>(point3_t(0, 0, -1), 0.5));
+    // std::cerr << kLowerLeftCorner << std::endl;
+    objects_.add(std::make_shared<Circle>(point3_t(0, 0, -1), 0.5));
   }
 
   void set_width(size_t width) {
@@ -55,13 +55,11 @@ public:
 private:
   color_t ray_color(const Ray &r) {
     // std::cerr << r << std::endl;
-    for (auto &o : objects_) {
-      auto h = o->hit(r, 0, 10);
-      if (h.has_value()) {
-        auto hit = h.value();
-        return 0.5 * color_t(hit.normal.x() + 1, hit.normal.y() + 1,
-                             hit.normal.z() + 1);
-      }
+    auto h = objects_.hit(r, 0, std::numeric_limits<double_t>::infinity());
+    if (h.has_value()) {
+      auto hit = h.value();
+      return 0.5 * color_t(hit.normal.x() + 1, hit.normal.y() + 1,
+                           hit.normal.z() + 1);
     }
 
     vec3d_t unit_direction = unit_vector(r.direction());
@@ -74,7 +72,7 @@ private:
 
   PpmImage image_;
 
-  std::vector<std::unique_ptr<Object>> objects_;
+  Objects objects_;
 };
 
 #endif // SC_SCENE_H
