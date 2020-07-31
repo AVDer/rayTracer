@@ -13,7 +13,8 @@ struct hit_t {
 
 class Object {
 public:
-  virtual std::optional<hit_t> hit(const Ray &ray) = 0;
+  virtual std::optional<hit_t> hit(const Ray &ray, double_t tmin,
+                                   double_t tmax) = 0;
 
 protected:
   color_t color_;
