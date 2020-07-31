@@ -16,13 +16,13 @@ public:
       result.ray_pos = (-k2_ - std::sqrt(k4_)) / k1_;
       if (result.ray_pos >= tmin && result.ray_pos <= tmax) {
         result.point = ray.at(result.ray_pos);
-        result.normal = unit_vector(result.point - center_);
+        result.set_normal_face(ray, (result.point - center_) / radius_);
         return result;
       }
       result.ray_pos = (-k2_ + std::sqrt(k4_)) / k1_;
       if (result.ray_pos >= tmin && result.ray_pos <= tmax) {
         result.point = ray.at(result.ray_pos);
-        result.normal = unit_vector(result.point - center_);
+        result.set_normal_face(ray, (result.point - center_) / radius_);
         return result;
       }
     }
