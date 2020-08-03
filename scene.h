@@ -11,6 +11,7 @@ class Scene {
 
   static const uint32_t kSpp{100};
   static const uint16_t kMaxDepth{10};
+  static const double_t kAcne{0.001};
 
 public:
   Scene() {
@@ -54,7 +55,8 @@ private:
     if (depth <= 0) {
       return color_t(0, 0, 0);
     }
-    auto h = objects_.hit(r, 0, std::numeric_limits<double_t>::infinity());
+    // 0,001 to remove shadow acne
+    auto h = objects_.hit(r, kAcne, std::numeric_limits<double_t>::infinity());
     if (h.has_value()) {
       auto hit = h.value();
       // return 0.5 * (hit.normal + color_t(1, 1, 1));
