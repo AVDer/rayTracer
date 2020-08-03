@@ -8,8 +8,8 @@ namespace rt {
 
 inline double_t deg_to_rad(double_t degrees) { return degrees * M_PIl / 180.0; }
 
-double_t random_double() {
-  static std::uniform_real_distribution<double_t> distribution(0.0, 1.0);
+template <typename T> T random_number(T min = 0, T max = 1) {
+  static std::uniform_real_distribution<T> distribution(min, max);
   static std::mt19937 generator;
   return distribution(generator);
 }

@@ -6,9 +6,9 @@
 #include "ray.h"
 
 struct hit_t {
-  point3_t point;
-  double_t ray_pos;
-  vec3d_t normal;
+  point3_t point;   // p
+  double_t ray_pos; // t
+  vec3d_t normal;   // normal
 
   // Assume that normal vector is always against the falling ray
   // front face means that it's true

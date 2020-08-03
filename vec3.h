@@ -4,6 +4,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "misc.h"
+
 template <typename T> class Vec3 {
 public:
   constexpr Vec3() : e_{0, 0, 0} {}
@@ -39,6 +41,16 @@ public:
     return e_[0] * e_[0] + e_[1] * e_[1] + e_[2] * e_[2];
   }
 
+  static constexpr Vec3 random() {
+    return Vec3(rt::random_number<T>(), rt::random_number<T>(),
+                rt::random_number<T>());
+  }
+
+  static constexpr Vec3 random(double min, double max) {
+    return Vec3(rt::random_number<T>(min, max), rt::random_number<T>(min, max),
+                rt::random_number<T>(min, max));
+  }
+
 private:
   T e_[3];
 };
@@ -50,6 +62,15 @@ using vec3d_t = Vec3<double_t>;
 
 using point3u = Vec3<uint32_t>;
 using coloru = Vec3<uint32_t>;
+
+template <typename T> Vec3<T> random_in_sphere() {
+  while (true) {
+    auto p = Vec3<T>::random(-1, 1);
+    if (p.length_squared() >= 1)
+      continue;
+    return p;
+  }
+}
 
 inline std::ostream &operator<<(std::ostream &out, const vec3d_t &v) {
   return out << v.x() << ' ' << v.y() << ' ' << v.z();

@@ -22,7 +22,10 @@ public:
   }
 
   void set_pixel(size_t x, size_t y, color_t color) {
-    data_[y][x] = color * kMaxColor / samples_per_pixel_;
+    data_[y][x] =
+        color_t(kMaxColor * std::sqrt(color.x() / samples_per_pixel_),
+                kMaxColor * std::sqrt(color.y() / samples_per_pixel_),
+                kMaxColor * std::sqrt(color.z() / samples_per_pixel_));
   }
 
   void set_spp(uint32_t samples_per_pixel) {
