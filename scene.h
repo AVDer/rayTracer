@@ -3,22 +3,35 @@
 
 #include "camera.h"
 #include "circle.h"
+#include "material.h"
 #include "misc.h"
 #include "objects.h"
 #include "ppm_image.h"
+
+static const double_t kAcne{0.001};
 
 class Scene {
 
   static const uint32_t kSpp{100};
   static const uint16_t kMaxDepth{10};
-  static const double_t kAcne{0.001};
 
 public:
   Scene() {
     // std::cerr << kLowerLeftCorner << std::endl;
     image_.set_spp(kSpp);
-    objects_.add(std::make_shared<Circle>(point3_t(0, 0, -1), 0.5));
-    objects_.add(std::make_shared<Circle>(point3_t(0, -100.5, -1), 100));
+    objects_.add(std::make_shared<Circle>(
+        point3_t(0, 0, -1), 0.5,
+        std::make_shared<Lambertian>(color_t(0.7, 0.3, 0.3))));
+    objects_.add(std::make_shared<Circle>(
+        point3_t(0, -100.5, -1), 100,
+        std::make_shared<Lambertian>(color_t(0.8, 0.8, 0.0))));
+
+    objects_.add(std::make_shared<Circle>(
+        point3_t(-1.0, 0.0, -1.0), 0.5,
+        std::make_shared<Metal>(color_t(0.8, 0.8, 0.8))));
+    objects_.add(std::make_shared<Circle>(
+        point3_t(1.0, 0.0, -1.0), 0.5,
+        std::make_shared<Metal>(color_t(0.8, 0.6, 0.2))));
   }
 
   void set_width(size_t width) {
@@ -60,8 +73,24 @@ private:
     if (h.has_value()) {
       auto hit = h.value();
       // return 0.5 * (hit.normal + color_t(1, 1, 1));
-      point3_t target = hit.point + hit.normal + random_in_sphere<double_t>();
-      return 0.5 * ray_color(Ray(hit.point, target - hit.point), depth - 1);
+
+      // point3_t target = hit.point + hit.normal +
+      // random_in_sphere<double_t>();
+
+      // point3_t target = hit.point + hit.normal +
+      // random_unit_vector<double_t>();
+
+      // point3_t target = hit.point +
+      // random_in_hemisphere<double_t>(hit.normal);
+
+      // return 0.5 * ray_color(Ray(hit.point, target - hit.point), depth - 1);
+
+      auto s = hit.material->scatter(r, hit);
+      if (s.has_value()) {
+        auto S = s.value();
+        return S.attenuation * ray_color(S.scattered, depth - 1);
+      }
+      return color_t(0, 0, 0);
     }
 
     vec3d_t unit_direction = unit_vector(r.direction());

@@ -72,6 +72,21 @@ template <typename T> Vec3<T> random_in_sphere() {
   }
 }
 
+template <typename T> Vec3<T> random_in_hemisphere(const Vec3<T> &normal) {
+  Vec3<T> in_unit_sphere = random_in_sphere<T>();
+  if (dot(in_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+    return in_unit_sphere;
+  else
+    return -in_unit_sphere;
+}
+
+template <typename T> Vec3<T> random_unit_vector() {
+  auto a = rt::random_number<T>(0, 2 * M_PIl);
+  auto z = rt::random_number<T>(-1, 1);
+  auto r = std::sqrt(static_cast<T>(1) - z * z);
+  return Vec3<T>(r * std::cos(a), r * std::sin(a), z);
+}
+
 inline std::ostream &operator<<(std::ostream &out, const vec3d_t &v) {
   return out << v.x() << ' ' << v.y() << ' ' << v.z();
 }
@@ -106,5 +121,9 @@ inline constexpr vec3d_t cross(const vec3d_t &u, const vec3d_t &v) {
 }
 
 inline constexpr vec3d_t unit_vector(vec3d_t v) { return v / v.length(); }
+
+inline vec3d_t reflect(const vec3d_t &v, const vec3d_t &n) {
+  return v - 2 * dot(v, n) * n;
+}
 
 #endif // CS_VEC3_H

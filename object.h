@@ -1,14 +1,20 @@
 #ifndef SC_OBJECT_H
 #define SC_OBJECT_H
 
+#include <memory>
 #include <optional>
 
+#include "material.h"
 #include "ray.h"
+
+class Material;
 
 struct hit_t {
   point3_t point;   // p
   double_t ray_pos; // t
   vec3d_t normal;   // normal
+
+  std::shared_ptr<Material> material;
 
   // Assume that normal vector is always against the falling ray
   // front face means that it's true
