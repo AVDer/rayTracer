@@ -39,13 +39,15 @@ public:
 
 class Metal : public Material {
 public:
-  Metal(const color_t &albedo) : albedo_(albedo) {}
+  Metal(const color_t &albedo, double_t fuzz)
+      : albedo_(albedo), fuzz_(std::min(fuzz, 1.)) {}
 
   std::optional<scatter_t> scatter([[maybe_unused]] const Ray &ray,
                                    const hit_t &hit) const override {
     scatter_t result;
     auto reflected = reflect(unit_vector(ray.direction()), hit.normal);
-    result.scattered = Ray(hit.point, reflected);
+    result.scattered =
+        Ray(hit.point, reflected + fuzz_ * random_in_sphere<double_t>());
     result.attenuation = albedo_;
     if (dot(result.scattered.direction(), hit.normal) > 0) {
       return result;
@@ -56,6 +58,7 @@ public:
 
 public:
   color_t albedo_;
+  double_t fuzz_;
 };
 
 #endif

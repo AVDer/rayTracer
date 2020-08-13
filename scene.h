@@ -12,7 +12,7 @@ static const double_t kAcne{0.001};
 
 class Scene {
 
-  static const uint32_t kSpp{100};
+  static const uint32_t kSpp{10};
   static const uint16_t kMaxDepth{10};
 
 public:
@@ -28,10 +28,10 @@ public:
 
     objects_.add(std::make_shared<Circle>(
         point3_t(-1.0, 0.0, -1.0), 0.5,
-        std::make_shared<Metal>(color_t(0.8, 0.8, 0.8))));
+        std::make_shared<Metal>(color_t(0.8, 0.8, 0.8), 0.3)));
     objects_.add(std::make_shared<Circle>(
         point3_t(1.0, 0.0, -1.0), 0.5,
-        std::make_shared<Metal>(color_t(0.8, 0.6, 0.2))));
+        std::make_shared<Metal>(color_t(0.8, 0.6, 0.2), 1)));
   }
 
   void set_width(size_t width) {
@@ -71,7 +71,6 @@ private:
     // 0,001 to remove shadow acne
     auto h = objects_.hit(r, kAcne, std::numeric_limits<double_t>::infinity());
     if (h.has_value()) {
-      auto hit = h.value();
       // return 0.5 * (hit.normal + color_t(1, 1, 1));
 
       // point3_t target = hit.point + hit.normal +
@@ -85,10 +84,9 @@ private:
 
       // return 0.5 * ray_color(Ray(hit.point, target - hit.point), depth - 1);
 
-      auto s = hit.material->scatter(r, hit);
+      auto s = h->material->scatter(r, *h);
       if (s.has_value()) {
-        auto S = s.value();
-        return S.attenuation * ray_color(S.scattered, depth - 1);
+        return s->attenuation * ray_color(s->scattered, depth - 1);
       }
       return color_t(0, 0, 0);
     }

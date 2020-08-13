@@ -4,6 +4,6 @@
 
 int main() {
   Scene scene;
-  scene.set_width(1920);
+  scene.set_width(400);
   scene.generate();
 }
