@@ -12,26 +12,32 @@ static const double_t kAcne{0.001};
 
 class Scene {
 
-  static const uint32_t kSpp{10};
+  static const uint32_t kSpp{1000};
   static const uint16_t kMaxDepth{10};
 
 public:
   Scene() {
     // std::cerr << kLowerLeftCorner << std::endl;
     image_.set_spp(kSpp);
-    objects_.add(std::make_shared<Circle>(
-        point3_t(0, 0, -1), 0.5,
-        std::make_shared<Lambertian>(color_t(0.7, 0.3, 0.3))));
+
+    // Ground
     objects_.add(std::make_shared<Circle>(
         point3_t(0, -100.5, -1), 100,
         std::make_shared<Lambertian>(color_t(0.8, 0.8, 0.0))));
 
+    // Left
+    objects_.add(std::make_shared<Circle>(point3_t(-1.0, 0.0, -1.0), 0.5,
+                                          std::make_shared<Dielectric>(1.5)));
+
+    // Center
     objects_.add(std::make_shared<Circle>(
-        point3_t(-1.0, 0.0, -1.0), 0.5,
-        std::make_shared<Metal>(color_t(0.8, 0.8, 0.8), 0.3)));
+        point3_t(0.0, 0.0, -1.0), 0.5,
+        std::make_shared<Lambertian>(color_t(0.1, 0.2, 0.5))));
+
+    // Right
     objects_.add(std::make_shared<Circle>(
         point3_t(1.0, 0.0, -1.0), 0.5,
-        std::make_shared<Metal>(color_t(0.8, 0.6, 0.2), 1)));
+        std::make_shared<Metal>(color_t(0.8, 0.6, 0.2), 0.0)));
   }
 
   void set_width(size_t width) {

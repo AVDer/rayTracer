@@ -1,8 +1,8 @@
 #ifndef CS_VEC3_H
 #define CS_VEC3_H
 
-#include <cmath>
 #include <iostream>
+#include <numbers>
 
 #include "misc.h"
 
@@ -81,7 +81,7 @@ template <typename T> Vec3<T> random_in_hemisphere(const Vec3<T> &normal) {
 }
 
 template <typename T> Vec3<T> random_unit_vector() {
-  auto a = rt::random_number<T>(0, 2 * M_PIl);
+  auto a = rt::random_number<T>(0, 2 * std::numbers::pi);
   auto z = rt::random_number<T>(-1, 1);
   auto r = std::sqrt(static_cast<T>(1) - z * z);
   return Vec3<T>(r * std::cos(a), r * std::sin(a), z);
@@ -122,8 +122,16 @@ inline constexpr vec3d_t cross(const vec3d_t &u, const vec3d_t &v) {
 
 inline constexpr vec3d_t unit_vector(vec3d_t v) { return v / v.length(); }
 
-inline vec3d_t reflect(const vec3d_t &v, const vec3d_t &n) {
+inline constexpr vec3d_t reflect(const vec3d_t &v, const vec3d_t &n) {
   return v - 2 * dot(v, n) * n;
+}
+
+inline constexpr vec3d_t refract(const vec3d_t &uv, const vec3d_t &n,
+                                 double_t etai_over_etat) {
+  auto cos_theta = dot(-uv, n);
+  vec3d_t r_out_perp = etai_over_etat * (uv + cos_theta * n);
+  vec3d_t r_out_parallel = -sqrt(fabs(1.0 - r_out_perp.length_squared())) * n;
+  return r_out_perp + r_out_parallel;
 }
 
 #endif // CS_VEC3_H
