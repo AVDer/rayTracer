@@ -12,32 +12,33 @@ static const double_t kAcne{0.001};
 
 class Scene {
 
-  static const uint32_t kSpp{1000};
+  static const uint32_t kSpp{100};
   static const uint16_t kMaxDepth{10};
 
 public:
-  Scene() {
+  Scene() : camera_(std::make_unique<Camera>(90)) {
+    camera_->set_look_from(point3_t(-2, 2, 1))
+        .set_look_at(point3_t(0, 0, -1))
+        .set_view_up(vec3d_t(0, 1, 0))
+        .calculate();
     // std::cerr << kLowerLeftCorner << std::endl;
     image_.set_spp(kSpp);
 
-    // Ground
-    objects_.add(std::make_shared<Circle>(
-        point3_t(0, -100.5, -1), 100,
-        std::make_shared<Lambertian>(color_t(0.8, 0.8, 0.0))));
+    auto material_ground = std::make_shared<Lambertian>(color_t(0.8, 0.8, 0.0));
+    auto material_center = std::make_shared<Lambertian>(color_t(0.1, 0.2, 0.5));
+    auto material_left = std::make_shared<Dielectric>(1.5);
+    auto material_right = std::make_shared<Metal>(color_t(0.8, 0.6, 0.2), 0.0);
 
-    // Left
+    objects_.add(std::make_shared<Circle>(point3_t(0.0, -100.5, -1.0), 100.0,
+                                          material_ground));
+    objects_.add(std::make_shared<Circle>(point3_t(0.0, 0.0, -1.0), 0.5,
+                                          material_center));
     objects_.add(std::make_shared<Circle>(point3_t(-1.0, 0.0, -1.0), 0.5,
-                                          std::make_shared<Dielectric>(1.5)));
-
-    // Center
-    objects_.add(std::make_shared<Circle>(
-        point3_t(0.0, 0.0, -1.0), 0.5,
-        std::make_shared<Lambertian>(color_t(0.1, 0.2, 0.5))));
-
-    // Right
-    objects_.add(std::make_shared<Circle>(
-        point3_t(1.0, 0.0, -1.0), 0.5,
-        std::make_shared<Metal>(color_t(0.8, 0.6, 0.2), 0.0)));
+                                          material_left));
+    objects_.add(std::make_shared<Circle>(point3_t(-1.0, 0.0, -1.0), -0.45,
+                                          material_left));
+    objects_.add(std::make_shared<Circle>(point3_t(1.0, 0.0, -1.0), 0.5,
+                                          material_right));
   }
 
   void set_width(size_t width) {
@@ -60,7 +61,7 @@ public:
         for (uint32_t s{0}; s < kSpp; ++s) {
           auto u = (double(i) + rt::random_number<double_t>()) / (width_ - 1);
           auto v = (double(j) + rt::random_number<double_t>()) / (height_ - 1);
-          color += ray_color(camera_.get_ray(u, v));
+          color += ray_color(camera_->get_ray(u, v));
         }
         image_.set_pixel(i, height_ - j - 1, color);
       }
@@ -109,7 +110,7 @@ private:
 
   PpmImage image_;
 
-  Camera camera_;
+  std::unique_ptr<Camera> camera_;
   Objects objects_;
 };
 
