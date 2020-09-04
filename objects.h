@@ -14,7 +14,7 @@ public:
   void add(std::shared_ptr<Object> object) { objects_.push_back(object); }
 
   std::optional<hit_t> hit(const Ray &ray, double_t tmin,
-                           double_t tmax) override {
+                           double_t tmax) const override {
     hit_t result;
     result.ray_pos = std::numeric_limits<double_t>::infinity();
     bool found{false};

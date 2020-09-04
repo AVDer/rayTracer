@@ -11,8 +11,12 @@ public:
       : center_(center), radius_(radius), material_(material) {}
 
   std::optional<hit_t> hit(const Ray &ray, double_t tmin,
-                           double_t tmax) override {
-    solve(ray);
+                           double_t tmax) const override {
+    auto oc = ray.origin() - center_;
+    double_t k1_ = ray.direction().length_squared();
+    double_t k2_ = dot(ray.direction(), oc);
+    double_t k3_ = oc.length_squared() - radius_ * radius_;
+    double_t k4_ = k2_ * k2_ - k1_ * k3_;
     if (k4_ >= 0) {
       hit_t result;
       result.ray_pos = (-k2_ - std::sqrt(k4_)) / k1_;
@@ -38,19 +42,12 @@ private:
   point3_t center_;
   double_t radius_;
   std::shared_ptr<Material> material_;
-
-  double_t k1_; // a
-  double_t k2_; // b / 2
-  double_t k3_; // c
-  double_t k4_; // D
-
-  void solve(const Ray &ray) {
-    auto oc = ray.origin() - center_;
-    k1_ = ray.direction().length_squared();
-    k2_ = dot(ray.direction(), oc);
-    k3_ = oc.length_squared() - radius_ * radius_;
-    k4_ = k2_ * k2_ - k1_ * k3_;
-  }
+  /*
+    double_t k1_; // a
+    double_t k2_; // b / 2
+    double_t k3_; // c
+    double_t k4_; // D
+  */
 };
 
 #endif // SC_CIRCLE_H
