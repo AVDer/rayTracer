@@ -12,33 +12,62 @@ static const double_t kAcne{0.001};
 
 class Scene {
 
-  static const uint32_t kSpp{100};
+  static const uint32_t kSpp{20};
   static const uint16_t kMaxDepth{10};
 
 public:
-  Scene() : camera_(std::make_unique<Camera>(90)) {
-    camera_->set_look_from(point3_t(-2, 2, 1))
-        .set_look_at(point3_t(0, 0, -1))
+  Scene() : camera_(std::make_unique<Camera>(20)) {
+    camera_->set_look_from(point3_t(13, 2, 3))
+        .set_look_at(point3_t(0, 0, 0))
         .set_view_up(vec3d_t(0, 1, 0))
         .calculate();
     // std::cerr << kLowerLeftCorner << std::endl;
     image_.set_spp(kSpp);
 
-    auto material_ground = std::make_shared<Lambertian>(color_t(0.8, 0.8, 0.0));
-    auto material_center = std::make_shared<Lambertian>(color_t(0.1, 0.2, 0.5));
-    auto material_left = std::make_shared<Dielectric>(1.5);
-    auto material_right = std::make_shared<Metal>(color_t(0.8, 0.6, 0.2), 0.0);
+    auto ground_material = std::make_shared<Lambertian>(color_t(0.5, 0.5, 0.5));
+    objects_.add(
+        make_shared<Circle>(point3_t(0, -1000, 0), 1000, ground_material));
 
-    objects_.add(std::make_shared<Circle>(point3_t(0.0, -100.5, -1.0), 100.0,
-                                          material_ground));
-    objects_.add(std::make_shared<Circle>(point3_t(0.0, 0.0, -1.0), 0.5,
-                                          material_center));
-    objects_.add(std::make_shared<Circle>(point3_t(-1.0, 0.0, -1.0), 0.5,
-                                          material_left));
-    objects_.add(std::make_shared<Circle>(point3_t(-1.0, 0.0, -1.0), -0.45,
-                                          material_left));
-    objects_.add(std::make_shared<Circle>(point3_t(1.0, 0.0, -1.0), 0.5,
-                                          material_right));
+    for (int a = -11; a < 11; a++) {
+      for (int b = -11; b < 11; b++) {
+        auto choose_mat = rt::random_number<double_t>();
+        point3_t center(a + 0.9 * rt::random_number<double_t>(), 0.2,
+                        b + 0.9 * rt::random_number<double_t>());
+
+        if ((center - point3_t(4, 0.2, 0)).length() > 0.9) {
+          std::shared_ptr<Material> sphere_material;
+
+          if (choose_mat < 0.8) {
+            // diffuse
+            auto albedo = color_t::random() * color_t::random();
+            sphere_material = std::make_shared<Lambertian>(albedo);
+            objects_.add(
+                std::make_shared<Circle>(center, 0.2, sphere_material));
+          } else if (choose_mat < 0.95) {
+            // metal
+            auto albedo = color_t::random(0.5, 1);
+            auto fuzz = rt::random_number<double_t>(0, 0.5);
+            sphere_material = std::make_shared<Metal>(albedo, fuzz);
+            objects_.add(
+                std::make_shared<Circle>(center, 0.2, sphere_material));
+          } else {
+            // glass
+            sphere_material = std::make_shared<Dielectric>(1.5);
+            objects_.add(
+                std::make_shared<Circle>(center, 0.2, sphere_material));
+          }
+        }
+      }
+    }
+
+    auto material1 = std::make_shared<Dielectric>(1.5);
+    objects_.add(std::make_shared<Circle>(point3_t(0, 1, 0), 1.0, material1));
+
+    auto material2 = std::make_shared<Lambertian>(color_t(0.4, 0.2, 0.1));
+    objects_.add(std::make_shared<Circle>(point3_t(-4, 1, 0), 1.0, material2));
+
+    auto material3 = std::make_shared<Metal>(color_t(0.7, 0.6, 0.5), 0.0);
+    objects_.add(std::make_shared<Circle>(point3_t(4, 1, 0), 1.0, material3));
   }
 
   void set_width(size_t width) {
@@ -50,13 +79,14 @@ public:
   void generate() {
     uint32_t progress{0};
     for (size_t j{0}; j < height_; ++j) {
+      uint32_t new_progress{static_cast<uint32_t>(j * 100 / height_)};
+      if (new_progress != progress) {
+        progress = new_progress;
+        std::cerr << progress << "%\n";
+      }
+
       for (size_t i{0}; i < width_; ++i) {
-        uint32_t new_progress{static_cast<uint32_t>(j * 100 / height_)};
-        if (new_progress != progress) {
-          progress = new_progress;
-          std::cerr << progress << "%\n";
-        }
-        // std::cerr << "y: " << j << "\tx: " << i << '\n';
+
         color_t color(0, 0, 0);
         for (uint32_t s{0}; s < kSpp; ++s) {
           auto u = (double(i) + rt::random_number<double_t>()) / (width_ - 1);
